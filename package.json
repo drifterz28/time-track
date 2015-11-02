@@ -36,7 +36,6 @@
     "jshint-stylish": "2.0.1",
     "matchdep": "1.0.0",
     "minifyify": "7.1.0",
-    "node-sass": "^3.4.0",
     "react": "0.14.2",
     "react-tools": "^0.13.3",
     "reactify": "^1.1.1",
