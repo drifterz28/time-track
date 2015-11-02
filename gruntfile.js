@@ -62,17 +62,17 @@ module.exports = function(grunt) {
                 }],
             },
         },
-        sass: {
-            options: {
-                sourceMap: true,
-                outputStyle: 'compressed'
-            },
-            dist: {
-                files: {
-                    '<%= project.css %>/style.css': '<%= project.scss %>/style.scss'
-                }
-            }
-        },
+        // sass: {
+        //     options: {
+        //         sourceMap: true,
+        //         outputStyle: 'compressed'
+        //     },
+        //     dist: {
+        //         files: {
+        //             '<%= project.css %>/style.css': '<%= project.scss %>/style.scss'
+        //         }
+        //     }
+        // },
         less: {
             options: {
                 // cleancss: true, // unfortunately cleancss strips out the sourcemap comment!
