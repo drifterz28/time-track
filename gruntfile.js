@@ -41,7 +41,7 @@ module.exports = function(grunt) {
         copy: {
             main: {
                 src: '<%= project.src %>/index.html',
-                dest: '<%= project.app %>/index.html',
+                dest: 'index.html',
             },
         },
         jshint: {
