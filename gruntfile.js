@@ -128,8 +128,8 @@ module.exports = function(grunt) {
     require('matchdep').filter('grunt-*').forEach(grunt.loadNpmTasks);
 
     grunt.registerTask('js', ['jshint', 'browserify:dist']);
-    //grunt.registerTask('css', ['less']);
-    grunt.registerTask('css', ['sass']);
+    grunt.registerTask('css', ['less']);
+    //grunt.registerTask('css', ['sass']);
     grunt.registerTask('img', ['imagemin']);
     grunt.registerTask('build', ['copy:main', 'js', 'css', 'img']);
 };
