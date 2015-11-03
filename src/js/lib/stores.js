@@ -1,42 +1,54 @@
 // basic store, not compleate
-
 'use strict';
 var Reflux = require('reflux');
 var Actions = require('./actions');
-var _info = {};
+var moment = require('moment');
+
+var _info = (localStorage.timeTrack) ? JSON.parse(localStorage.timeTrack) : [];
 
 module.exports = Reflux.createStore({
     init: function() {
-        this.listenTo(Actions.addActivity, this.onCreate);
-        this.listenTo(Actions.editActivity, this.onEdit);
-        this.listenTo(Actions.saveSettings, this.onSave);
+        this.listenTo(Actions.ClockIn, this.onCreate);
+        this.listenTo(Actions.ClockOut, this.onEdit);
     },
     // called on save
     onCreate: function(info) {
-        _info.activities.push(info);
-        this.saveInfo();
-        this.trigger(_info);
     },
     // called on edit save
     onEdit: function(info) {
-        for(var i = 0; i < _info.length; i++) {
-            if(_info[i]._id === info._id) {
-                _info[i].lastEnd = info.lastEnd;
-                _info[i].inP = info.inP;
-                this.saveInfo();
-                this.trigger(_info);
-                break;
-            }
-        }
     },
-    onSave: function(info) {
-        _info = this.recalculate(_info);
-        this.saveInfo();
-        this.trigger(_info);
+    getName: function() {
+        return localStorage.timeTracker;
+    },
+    signIn: function(name, pin) {
+        console.log(name + ' - ' + pin);
+        localStorage.timeTracker = name;
+        this.trigger();
+    },
+    isSignedIn: function() {
+        if(localStorage.timeTracker) {
+            return true;
+        } else {
+            return false;
+        }
+
     },
     // called on load from jsx template
-    getInfo: function() {
+    getTimes: function() {
         return _info;
+    },
+    trackTime: function(state) {
+        var clockTime = moment().format('YYYY/MM/DD HH:mm');
+        var info = {};
+        if(_info[0] && _info[0][state] || _info.length < 1) {
+            info[state] = clockTime;
+            _info.unshift(info);
+        } else {
+            _info[0][state] = clockTime;
+        }
+
+        this.save();
+        this.trigger();
     },
     // called on note click to edit
     getInfoById: function(id) {
@@ -45,5 +57,8 @@ module.exports = Reflux.createStore({
                 return _info[i];
             }
         }
+    },
+    save: function() {
+        localStorage.timeTrack = JSON.stringify(_info);
     }
 });

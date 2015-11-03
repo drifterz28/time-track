@@ -41,7 +41,7 @@ module.exports = function(grunt) {
         copy: {
             main: {
                 src: '<%= project.src %>/index.html',
-                dest: 'index.html',
+                dest: './index.html',
             },
         },
         jshint: {
@@ -93,6 +93,10 @@ module.exports = function(grunt) {
             scripts: {
                 files: ['<%= project.srcJs %>/**/*.js', '<%= project.src %>/react/*.jsx'],
                 tasks: ['browserify:dist']
+            },
+            copy: {
+                files: '<%= project.src %>/index.html',
+                tasks: ['copy']
             },
             less: {
                 files: '<%= project.less %>/**/*.less',
