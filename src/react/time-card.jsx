@@ -9,7 +9,7 @@ module.exports = React.createClass({
     getInitialState:function() {
         return {
             name: Store.getName(),
-            timeState: 'In'
+            timeState: Store.getTimeState()
         };
     },
     componentDidMount: function() {

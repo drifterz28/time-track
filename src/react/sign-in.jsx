@@ -17,7 +17,7 @@ module.exports = React.createClass({
                 <label htmlFor="inputEmail" className="sr-only">First Name</label>
                 <input type="text" id="inputEmail" className="form-control" placeholder="First Name" required autofocus/>
                 <label htmlFor="inputPassword" className="sr-only">Pin</label>
-                <input type="password" id="inputPassword" className="form-control" placeholder="Pin" required/>
+                <input type="password" id="inputPassword" className="form-control" placeholder="Pin" required pattern="[0-9]*" inputmode="numeric"/>
                 <button className="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
             </form>
         );

@@ -38,8 +38,10 @@ module.exports = React.createClass({
             if(data.Out) {
                 var b = moment(data.In);
                 var a = moment(data.Out);
-                var timeDiff = +Math.max( Math.round( a.diff(b, 'hours', true) * 10) / 10, 2.8 ).toFixed(1);
+                var diff = a.diff(b, 'hours', true);
+                var timeDiff = +Math.max( Math.round( diff * 10) / 10).toFixed(1);
                 totalTime = totalTime + timeDiff;
+                totalTime = +Math.max( Math.round( totalTime * 10) / 10).toFixed(1);
                 outTime = moment(data.Out).format("MM/DD/YYYY hh:mm a");
             }
             return (

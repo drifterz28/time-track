@@ -37,6 +37,13 @@ module.exports = Reflux.createStore({
     getTimes: function() {
         return _info;
     },
+    getTimeState: function() {
+        if(_info[0].In && !_info[0].Out) {
+            return 'Out';
+        } else {
+            return 'In';
+        }
+    },
     trackTime: function(state) {
         var clockTime = moment().format('YYYY/MM/DD HH:mm');
         var info = {};
@@ -49,14 +56,6 @@ module.exports = Reflux.createStore({
 
         this.save();
         this.trigger();
-    },
-    // called on note click to edit
-    getInfoById: function(id) {
-        for(var i = 0; i < _info.length; i++) {
-            if(_info[i]._id === id) {
-                return _info[i];
-            }
-        }
     },
     save: function() {
         localStorage.timeTrack = JSON.stringify(_info);
