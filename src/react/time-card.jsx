@@ -22,6 +22,10 @@ module.exports = React.createClass({
         console.log('change');
         //this.setState({needsSignin: Store.isSignedIn()});
     },
+    signOut: function(e) {
+        e.preventDefault();
+        Store.signOut();
+    },
     TrackTime: function() {
         Store.trackTime(this.state.timeState);
         var state = (this.state.timeState === 'In') ? 'Out' : 'In';
@@ -32,7 +36,10 @@ module.exports = React.createClass({
     render: function() {
         return (
             <div className="time-card">
-                <h3>Welcome {this.state.name}</h3>
+                <h3>
+                    Welcome {this.state.name}
+                    <small className="signout"><a href="#" onClick={this.signOut}>Sign Out</a></small>
+                </h3>
                 <button onClick={this.TrackTime} className="btn btn-success btn-lg btn-block">Clock {this.state.timeState}</button>
                 <Times/>
             </div>

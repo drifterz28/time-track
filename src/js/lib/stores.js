@@ -37,6 +37,10 @@ module.exports = Reflux.createStore({
     getTimes: function() {
         return _info;
     },
+    signOut: function() {
+        delete localStorage.timeTracker;
+        this.trigger();
+    },
     getTimeState: function() {
         if(_info[0].In && !_info[0].Out) {
             return 'Out';
