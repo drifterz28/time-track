@@ -21,9 +21,24 @@ module.exports = Reflux.createStore({
         return localStorage.timeTracker;
     },
     signIn: function(name, pin) {
-        console.log(name + ' - ' + pin);
-        localStorage.timeTracker = name;
-        this.trigger();
+        //console.log(name + ' - ' + pin);
+        //localStorage.timeTracker = name;
+        var request = new Request('/crud.php/login', {
+            method: 'POST'
+        });
+        fetch('/crud.php/login', {
+            method: 'POST',
+            body: JSON.stringify({
+                name: name,
+                pin: pin
+            })
+        }).then(function(response) {
+            // Convert to JSON
+            return response.json();
+        }).then(function(j) {
+            this.trigger(j);
+        });
+
     },
     isSignedIn: function() {
         if(localStorage.timeTracker) {
@@ -31,6 +46,9 @@ module.exports = Reflux.createStore({
         } else {
             return false;
         }
+
+    },
+    create: function() {
 
     },
     // called on load from jsx template

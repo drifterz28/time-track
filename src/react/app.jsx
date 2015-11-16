@@ -21,16 +21,12 @@ module.exports = React.createClass({
     onChange: function() {
         this.setState({needsSignin: Store.isSignedIn()});
     },
-    admin: function() {
-        console.log('admin mode');
-    },
     render: function() {
         return (
             <div className="container">
                 {
                     this.state.needsSignin ? <TimeCard/> : <Signin/>
                 }
-                <div onClick={this.admin} className="lifeOfPi">&#960;</div>
             </div>
         );
     }

@@ -12,7 +12,7 @@
   "noarg": true,
   "esnext": true,
   "node": true,
-  "predef": ["require", "jQuery", "$", "YT"],
+  "predef": ["Request", "Headers"],
   "strict": true,
   "undef": true
 }

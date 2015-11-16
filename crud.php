@@ -62,7 +62,19 @@ function createUser() {
 
 // return if valid and login time
 function login() {
-    echo 'hello login';
+    $data = json_decode(file_get_contents('php://input'), true);
+    $db = connect();
+    $name = $data['name'];
+    $pin = $data['pin'];
+    $userSql = "SELECT Id, Name, Role FROM 'Users' WHERE Name = '$name' AND Pin = '$pin'";
+    $rowCount = $db->query($userSql, PDO::FETCH_ASSOC);
+    if($rowCount->fetchColumn() > 0) {
+        foreach ($db->query($userSql, PDO::FETCH_ASSOC) as $row) {
+            echo json_encode($row);
+        }
+    } else {
+        echo '{"error": "Wrong User name or Pin"}';
+    }
 }
 
 function trackTime() {
@@ -72,6 +84,8 @@ function trackTime() {
 function getTimes() {
     $db = connect();
     $userId = $_GET['user'];
-    $result = $db->query("SELECT * FROM Times Where UserId = '$userId'");
-
+    $userSql = "SELECT * FROM 'Users' WHERE Name = '$name' AND Pin = '$pin'";
+    foreach ($db->query($userSql, PDO::FETCH_ASSOC) as $row) {
+        print_r($row);
+    }
 }
