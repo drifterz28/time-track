@@ -8,12 +8,21 @@ var Times = require('./times.jsx');
 module.exports = React.createClass({
     getInitialState:function() {
         return {
-            name: Store.getName(),
-            timeState: Store.getTimeState()
+            name: null,
+            userId: null,
+            role: null,
+            timeState: 'In'
         };
     },
     componentDidMount: function() {
         this.unsubscribe = Store.listen(this.onChange);
+        var userInfo = Store.getUserInfo();
+        this.setState({
+            name: userInfo.Name,
+            userId: userInfo.Id,
+            role: userInfo.Role,
+            timeState: Store.getTimeState()
+        });
     },
     componentWillUnmount: function() {
         this.unsubscribe();
@@ -27,7 +36,7 @@ module.exports = React.createClass({
         Store.signOut();
     },
     TrackTime: function() {
-        Store.trackTime(this.state.timeState);
+        Store.trackTime();
         var state = (this.state.timeState === 'In') ? 'Out' : 'In';
         this.setState({
             timeState: state

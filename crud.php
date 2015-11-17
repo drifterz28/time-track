@@ -17,7 +17,7 @@ switch($path) {
         trackTime();
         break;
     case 'times':
-        getTimea();
+        getTimes();
         break;
     case 'install':
         install();
@@ -37,7 +37,7 @@ function connect() {
 function install() {
     $db = connect();
     $db->exec("CREATE TABLE IF NOT EXISTS Users (Id INTEGER PRIMARY KEY autoincrement, Name TEXT, Pin INTEGER, Role INTEGER)");
-    $db->exec("CREATE TABLE IF NOT EXISTS Times (Id INTEGER PRIMARY KEY autoincrement, TimeIn TEXT, TimeOut TEXT, UserId INTEGER)");
+    $db->exec("CREATE TABLE IF NOT EXISTS Times (Id INTEGER PRIMARY KEY autoincrement, TimeIn TEXT, TimeOut TEXT, UserId INTEGER, Paid TEXT)");
 }
 
 // create user send in 2 params, Name and role. Pin will default to 1111 and will be changed later
@@ -54,9 +54,9 @@ function createUser() {
     )";
     $insert = $db->prepare($user_sql);
     if($insert->execute(array($_GET['name'], 1111, $_GET['role']))) {
-        echo '{userId: ' . $db->lastInsertId() . ', name: ' . $_GET['name'] . '}';
+        echo '{"userId": ' . $db->lastInsertId() . ', "name": ' . $_GET['name'] . '}';
     } else {
-        echo '{error: "failed to create user"}';
+        echo '{"error": "failed to create user"}';
     }
 }
 
@@ -78,14 +78,50 @@ function login() {
 }
 
 function trackTime() {
-    echo 'hello timesd';
+    $db = connect();
+    $userId = $_GET['userId'];
+    // find if there are clocked in times to clock out of.
+    $timeSql = "SELECT Id FROM 'Times' WHERE userId = $userId AND TimeIn IS NOT NULL AND TimeOut IS NULL";
+
+    $rowCount = $db->query($timeSql, PDO::FETCH_ASSOC);
+    if($rowCount->fetchColumn() > 0) {
+        // update row
+        $keyId = '';
+        foreach ($db->query($timeSql, PDO::FETCH_ASSOC) as $row) {
+            $keyId = $row['Id'];
+        }
+        $review_sql = "UPDATE Times SET TimeOut = ? WHERE id = ?";
+        $insert = $db->prepare($review_sql);
+        if($insert->execute(array($_GET['time'], $keyId))) {
+            echo '{"status": "updated"}';
+        } else {
+            echo '{"error": "failed to track time"}';
+        }
+    } else {
+        // insert row
+        $timeInsert = "INSERT into 'Times' (TimeIn, UserId) VALUES (:timeIn, :userId)";
+        $insert = $db->prepare($timeInsert);
+        if($insert->execute(array($_GET['time'], $userId))) {
+            echo '{"status": "inserted"}';
+        } else {
+            echo '{"error": "failed to track time"}';
+        }
+        // insert row
+    }
 }
 
 function getTimes() {
     $db = connect();
-    $userId = $_GET['user'];
-    $userSql = "SELECT * FROM 'Users' WHERE Name = '$name' AND Pin = '$pin'";
-    foreach ($db->query($userSql, PDO::FETCH_ASSOC) as $row) {
-        print_r($row);
+    $userId = $_GET['userId'];
+    $userSql = "SELECT * FROM 'Times' WHERE UserId = '$userId' AND Paid IS NULL ORDER BY Id DESC";
+    $rowCount = $db->query($userSql, PDO::FETCH_ASSOC);
+    if($rowCount->fetchColumn() > 0) {
+        $times = [];
+        foreach ($db->query($userSql, PDO::FETCH_ASSOC) as $row) {
+            $times[] = $row;
+        }
+        echo json_encode($times);
+    } else {
+        echo '[]';
     }
 }

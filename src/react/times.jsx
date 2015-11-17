@@ -7,23 +7,28 @@ var moment = require('moment');
 
 module.exports = React.createClass({
     getInitialState:function() {
-        var times = Store.getTimes();
         return {
-            times: times
+            times: []
         };
     },
     componentDidMount: function() {
         this.unsubscribe = Store.listen(this.onChange);
+        this.onChange();
     },
     componentWillUnmount: function() {
         this.unsubscribe();
     },
     onChange: function() {
-        var times = Store.getTimes();
-        this.setState({times: times});
+        var userId = Store.getUserInfo().Id;
+        var self = this;
+        fetch('/crud.php/times?userId=' + userId).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            self.setState({times: j});
+        });
     },
     TrackTime: function() {
-        Store.trackTime(this.state.timeState);
+        Store.trackTime();
         var state = (this.state.timeState === 'In') ? 'Out' : 'In';
         this.setState({
             timeState: state
@@ -34,20 +39,21 @@ module.exports = React.createClass({
         var totalTime = 0;
         var times = data.map(function(data, i) {
             var outTime = '';
-            var inTime = moment(data.In).format("MM/DD/YYYY hh:mm a");
+            var inTime = moment(data.TimeIn).format("MM/DD/YYYY hh:mm a");
             var timeDiff = '';
-            if(data.Out) {
-                var b = moment(data.In);
-                var a = moment(data.Out);
+            if(data.TimeOut) {
+                var b = moment(data.TimeIn);
+                var a = moment(data.TimeOut);
                 var diff = a.diff(b, 'hours', true);
                 timeDiff = +Math.max( Math.round( diff * 10) / 10).toFixed(1);
+                console.log(timeDiff);
                 totalTime = totalTime + timeDiff;
                 totalTime = +Math.max( Math.round( totalTime * 10) / 10).toFixed(1);
-                outTime = moment(data.Out).format("MM/DD/YYYY hh:mm a");
+                outTime = moment(data.TimeOut).format("MM/DD/YYYY hh:mm a");
             }
             return (
-                <li className="list-group-item" key={i}>
-                    {data.Out ? <span className="badge">{timeDiff}<br/> hours</span> : ''}
+                <li className="list-group-item" key={data.Id}>
+                    {data.TimeOut ? <span className="badge">{timeDiff}<br/> hours</span> : ''}
                     In: {inTime} <br/> Out: {outTime}
                 </li>
             );

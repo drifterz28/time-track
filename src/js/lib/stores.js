@@ -4,7 +4,7 @@ var Reflux = require('reflux');
 var Actions = require('./actions');
 var moment = require('moment');
 
-var _info = (localStorage.timeTrack) ? JSON.parse(localStorage.timeTrack) : [];
+var _info = [];
 
 module.exports = Reflux.createStore({
     init: function() {
@@ -17,15 +17,11 @@ module.exports = Reflux.createStore({
     // called on edit save
     onEdit: function(info) {
     },
-    getName: function() {
-        return localStorage.timeTracker;
+    getUserInfo: function() {
+        return JSON.parse(localStorage.timeTracker);
     },
     signIn: function(name, pin) {
-        //console.log(name + ' - ' + pin);
-        //localStorage.timeTracker = name;
-        var request = new Request('/crud.php/login', {
-            method: 'POST'
-        });
+        var self = this;
         fetch('/crud.php/login', {
             method: 'POST',
             body: JSON.stringify({
@@ -33,12 +29,14 @@ module.exports = Reflux.createStore({
                 pin: pin
             })
         }).then(function(response) {
-            // Convert to JSON
             return response.json();
         }).then(function(j) {
-            this.trigger(j);
+            if(!j.error) {
+                j.signinDate = Date.now();
+                localStorage.timeTracker = JSON.stringify(j);
+            }
+            self.trigger(j);
         });
-
     },
     isSignedIn: function() {
         if(localStorage.timeTracker) {
@@ -53,33 +51,34 @@ module.exports = Reflux.createStore({
     },
     // called on load from jsx template
     getTimes: function() {
-        return _info;
+        var userId = this.getUserInfo().Id;
+        fetch('/crud.php/times?userId=' + userId).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            _info = j;
+            return j;
+        });
     },
     signOut: function() {
         delete localStorage.timeTracker;
         this.trigger();
     },
     getTimeState: function() {
-        if(_info[0].In && !_info[0].Out) {
-            return 'Out';
-        } else {
+        //if(_info[0].In && !_info[0].Out) {
+        //    return 'Out';
+        //} else {
             return 'In';
-        }
+        //}
     },
-    trackTime: function(state) {
+    trackTime: function() {
         var clockTime = moment().format('YYYY/MM/DD HH:mm');
-        var info = {};
-        if(_info[0] && _info[0][state] || _info.length < 1) {
-            info[state] = clockTime;
-            _info.unshift(info);
-        } else {
-            _info[0][state] = clockTime;
-        }
-
-        this.save();
-        this.trigger();
-    },
-    save: function() {
-        localStorage.timeTrack = JSON.stringify(_info);
+        var userId = this.getUserInfo().Id;
+        var self = this;
+        fetch('/crud.php/time/track?userId=' + userId + '&time=' + clockTime).then(function(response) {
+            return response.json();
+        }).then(function(j) {
+            _info = j;
+            self.trigger();
+        });
     }
 });
